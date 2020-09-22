@@ -1,4 +1,4 @@
-﻿#Connect to Exchange Online PowerShell
+#Connect to Exchange Online PowerShell
  Param
  (
     [Parameter(Mandatory = $false)]
@@ -110,7 +110,8 @@ foreach ($mailbox in $mailboxes) {
         foreach ($recipient in $recipients) {
             $email = ($recipient -split "SMTP:")[1].Trim("]")
             $domain = ($email -split "@")[1]
- 
+    
+        
             if ($domains.DomainName -notcontains $domain) {
                 $externalRecipients += $email
             }    
@@ -119,26 +120,29 @@ foreach ($mailbox in $mailboxes) {
         if ($externalRecipients) {
             $extRecString = $externalRecipients -join ", "
             Write-Host "$($rule.Name) forwards to $extRecString" -ForegroundColor Yellow
- 
-            $ruleHash = $null
-            $ruleHash = [ordered]@{
-                PrimarySmtpAddress = $mailbox.PrimarySmtpAddress
-                DisplayName        = $mailbox.DisplayName
-                RuleId             = $rule.Identity
-                RuleName           = $rule.Name
-                RuleDescription    = $rule.Description
-                ExternalRecipients = $extRecString
+                      Write-Host "Saving The .Csv File"
+        
+          $PrimarySmtpAddress = $mailbox.PrimarySmtpAddress
+                $DisplayName        = $mailbox.DisplayName
+                $RuleId             = $rule.Identity
+                $RuleName           = $rule.Name
+               $RuleDescription    = $rule.Description
+                $Externalrecipients = $extRecString
                 
-         
+
+        Export-Csv c:/ForwardingRules.csv -InputObject $mailbox -InputObject  $PrimarySmtpAddress -InputObject $DisplayName  -InputObject $RuleId  -InputObject $RuleName -InputObject  -InputObject $RuleDescription  -InputObject $Externalrecipients -append
+            
+            
+      
+          
+ 
 
                }
             }                     
-            Write-Host $ruleHash
-            Pause
-            $ruleObject = New-Object PSObject -Property $ruleHash
-           $ruleObject =  Import-Csv C:\externalrules.csv $ruleHash
-            $ruleObject =  Export-Csv C:\externalrules.csv
+         
            
+
+         
         }
-    }
-   
+    
+  
